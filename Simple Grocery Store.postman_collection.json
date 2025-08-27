@@ -1,0 +1,1738 @@
+{
+	"info": {
+		"_postman_id": "12e792f8-0043-4636-a055-c83d6333a4bf",
+		"name": "Simple Grocery Store",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36692833"
+	},
+	"item": [
+		{
+			"name": "Status",
+			"item": [
+				{
+					"name": "Check Status Of Server",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ✅ Test 1: Check if the response status code is 200 (OK - successful request)\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// ✅ Test 3: Verify that the response format is JSON\r",
+									"pm.test(\"Response is in JSON format\", function () {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"// ✅ Test 4: Verify that the response body contains the word \"status\"\r",
+									"// (this checks the raw text of the body, not the parsed JSON)\r",
+									"pm.test(\"Response body contains 'status'\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"status\"); \r",
+									"});\r",
+									"\r",
+									"// ✅ Test 5: Check that the \"status\" field in the JSON response is exactly \"UP\"\r",
+									"pm.test(\"Status value is 'UP'\", function () {\r",
+									"    let jsonData = pm.response.json();   // parse response as JSON\r",
+									"    pm.expect(jsonData.status).to.eql('UP');  // strict equality check\r",
+									"});\r",
+									"\r",
+									"// ✅ Test 6: Check that the \"status\" field is either \"UP\" or \"Down\"\r",
+									"// (this makes the test more flexible if API can return different values)\r",
+									"pm.test(\"Status value is 'UP or Down'\", function () {\r",
+									"    let jsonData = pm.response.json();   // parse response as JSON\r",
+									"    pm.expect([\"UP\", \"Down\"]).to.include(jsonData.status); // must be one of these values\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "/*\r\nStatus code = 200 → confirms the API responded successfully.\r\n\r\nResponse time < 3000ms → ensures good performance.\r\n\r\nResponse is JSON → format validation.\r\n\r\nBody contains \"status\" → checks that the keyword exists in the response body.\r\n\r\nStatus = \"UP\" → ensures API is healthy (expected value).\r\n\r\nStatus = \"UP\" or \"Down\" → allows flexibility if API can return different health states.\r\n*/",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_Url}}/status",
+							"host": [
+								"{{Base_Url}}"
+							],
+							"path": [
+								"status"
+							]
+						},
+						"description": "## Endpoint: Get Status\n\n### Purpose\n\nThis endpoint retrieves the current status of the application. It is useful for monitoring the health and availability of the service.\n\n### Request\n\n- **Method**: GET\n    \n- **URL**: `{{Base_Url}}/status`\n    \n\n### Response\n\n- **Status Code**: 200 OK\n    \n- **Content-Type**: application/json\n    \n- { \"status\": \"\"}\n    \n    - `status`: A string indicating the current status of the application. The value will provide information about whether the service is operational.\n        \n\n### Notes\n\n- No additional parameters are required for this request.\n    \n- The response will always be in JSON format, containing the status of the application.\n    \n\nThis endpoint is used to retrieve the current status of the application. It provides a simple way to check whether the service is operational.\n\n#### Request Parameters\n\n- This endpoint does not require any input parameters.\n    \n\n#### Response Structure\n\nOn a successful request, the response will be returned with a status code of `200` and will include the following JSON structure:\n\n``` json\n{\n  \"status\": \"\"\n}\n\n ```\n\n- **status**: A string that indicates the current status of the application. The value will provide insight into the operational state of the service."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Get All Products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ✅ Test 1: Check if status code is 200 (successful response)\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// ✅ Test 3: Check if response body contains the string \"id\"\r",
+									"pm.test(\"Body contains 'id'\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"id\");\r",
+									"});\r",
+									"\r",
+									"// ✅ Test 4: Check if response body contains the string \"category\"\r",
+									"pm.test(\"Body contains 'category'\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"category\");\r",
+									"});\r",
+									"\r",
+									"// ✅ Test 5: Check if response body contains the string \"name\"\r",
+									"pm.test(\"Body contains 'name'\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"name\");\r",
+									"});\r",
+									"\r",
+									"// ✅ Test 6: Check if response body contains the string \"inStock\"\r",
+									"pm.test(\"Body contains 'inStock'\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"inStock\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"// 🔹 Parse the response body as JSON so we can work with objects/arrays\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"// 🔹 If the response is an array of products, keep it as is\r",
+									"//    If it’s a single product object, wrap it in an array (so we can loop safely)\r",
+									"var products = Array.isArray(jsonData) ? jsonData : [jsonData];\r",
+									"\r",
+									"// ✅ Test 7: Validate datatypes of each product's fields\r",
+									"pm.test(\"Validate datatypes of product fields\", function () {\r",
+									"    products.forEach(function(item) {\r",
+									"        // id should be a number\r",
+									"        pm.expect(item.id).to.be.a(\"number\");\r",
+									"\r",
+									"        // category should be a non-empty string\r",
+									"        pm.expect(item.category).to.be.a(\"string\");\r",
+									"        pm.expect(item.category.length).to.be.above(0);\r",
+									"\r",
+									"        // name should be a non-empty string\r",
+									"        pm.expect(item.name).to.be.a(\"string\");\r",
+									"        pm.expect(item.name.length).to.be.above(0);\r",
+									"\r",
+									"        // inStock should be a boolean (true/false)\r",
+									"        pm.expect(typeof item.inStock).to.eql(\"boolean\");\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "/*\r\nStatus + Performance: First two tests check API health (status 200) and speed (< 3000 ms).\r\n\r\nBody String Checks: Quick check that expected fields exist in the raw response text.\r\n\r\nJSON Parsing: Convert response into jsonData (JS object).\r\n\r\nArray Handling: Ensure products is always an array (so loop works).\r\n\r\nDatatype Validation: Deep check each field type (id → number, category → string, name → string, inStock → boolean).\r\n*/",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_Url}}/products",
+							"host": [
+								"{{Base_Url}}"
+							],
+							"path": [
+								"products"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": null,
+									"description": "Specifies the category of products you want to be returned. It can be one of: meat-seafood, fresh-produce, candy, bread-bakery, dairy, eggs, coffee.",
+									"disabled": true
+								},
+								{
+									"key": "results",
+									"value": null,
+									"description": "Specifies the number of results you want. Must be number between 1 and 20. By default, only 20 products will be displayed.",
+									"disabled": true
+								},
+								{
+									"key": "available",
+									"value": null,
+									"description": "Specifies the availability of the products. By default, all products will be displayed.",
+									"disabled": true
+								}
+							]
+						},
+						"description": "### API Endpoint: Retrieve Products\n\nThis endpoint allows you to retrieve a list of products based on specific query parameters. It is particularly useful for filtering products by category, limiting the number of results, and checking availability.\n\n#### Request Parameters\n\n- **category** (optional): A string parameter to filter products by their category.\n    \n- **results** (optional): An integer parameter to specify the maximum number of products to return.\n    \n- **available** (optional): A boolean parameter to filter products based on their availability in stock.\n    \n\n#### Response Structure\n\nOn a successful request, the API returns a JSON array of product objects, each containing the following fields:\n\n- **id**: A unique identifier for the product (integer).\n    \n- **category**: The category to which the product belongs (string).\n    \n- **name**: The name of the product (string).\n    \n- **inStock**: A boolean indicating whether the product is currently in stock.\n    \n\n#### Example Response\n\n``` json\n[\n    {\n        \"id\": 0,\n        \"category\": \"\",\n        \"name\": \"\",\n        \"inStock\": true\n    }\n]\n\n ```\n\nThis response structure allows clients to easily parse and utilize the product information retrieved from the API."
+					},
+					"response": []
+				},
+				{
+					"name": "Get a product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ✅ Case 1: If response code is 200 → Run success tests\r",
+									"if (pm.response.code === 200) {\r",
+									"\r",
+									"    // 🟢 Test 1: Verify that the HTTP response code is 200 (OK)\r",
+									"    pm.test(\"Response status code is 200\", function () {\r",
+									"        // `pm.response.code` → numeric code (200, 404, etc.)\r",
+									"        // `pm.response.status` → text (\"OK\", \"Not Found\")\r",
+									"        pm.expect(pm.response.code).to.equal(200);\r",
+									"    });\r",
+									"\r",
+									"    // 🟢 Test 3: Validate the response JSON structure and data types\r",
+									"    pm.test(\"Validate the response schema for required fields\", function () {\r",
+									"        const responseData = pm.response.json();  // parse JSON response\r",
+									"        \r",
+									"        // Response must be an object (not array/string/etc.)\r",
+									"        pm.expect(responseData).to.be.an('object');\r",
+									"        \r",
+									"        // Response must contain these exact keys\r",
+									"        pm.expect(responseData).to.have.all.keys(\r",
+									"            'id', \r",
+									"            'category', \r",
+									"            'name', \r",
+									"            'manufacturer', \r",
+									"            'price', \r",
+									"            'current-stock', \r",
+									"            'inStock'\r",
+									"        );\r",
+									"        \r",
+									"        // ✅ Validate that each field has the correct data type\r",
+									"        pm.expect(responseData.id).to.be.a('number');               // id → number\r",
+									"        pm.expect(responseData.category).to.be.a('string');         // category → string\r",
+									"        pm.expect(responseData.name).to.be.a('string');             // name → string\r",
+									"        pm.expect(responseData.manufacturer).to.be.a('string');     // manufacturer → string\r",
+									"        pm.expect(responseData.price).to.be.a('number');            // price → number\r",
+									"        pm.expect(responseData['current-stock']).to.be.a('number'); // current-stock → number\r",
+									"        pm.expect(responseData.inStock).to.be.a('boolean');         // inStock → boolean\r",
+									"    });\r",
+									"\r",
+									"    // 🟢 Test 4: Validate that price is always >= 0 (no negative prices allowed)\r",
+									"    pm.test(\"Price must be a non-negative number\", function () {\r",
+									"        const responseData = pm.response.json();\r",
+									"        pm.expect(responseData).to.have.property('price')\r",
+									"            .that.is.a('number')\r",
+									"            .and.is.at.least(0);  // ensures price >= 0\r",
+									"    });\r",
+									"\r",
+									"    // 🟢 Test 5: Validate that inStock is a boolean value\r",
+									"    pm.test(\"InStock is a boolean value\", function () {\r",
+									"        const responseData = pm.response.json();\r",
+									"        pm.expect(responseData.inStock).to.be.a('boolean');\r",
+									"    });\r",
+									"\r",
+									"} \r",
+									"// ✅ Case 2: If response code is 404 → Run error tests\r",
+									"else if (pm.response.code === 404) {\r",
+									"\r",
+									"    // 🔴 Test 1: Verify that the response code is 404 (Not Found)\r",
+									"    pm.test(\"Response status code is 404\", function () {\r",
+									"        pm.expect(pm.response.code).to.equal(404);  // numeric check\r",
+									"    });\r",
+									"\r",
+									"    // 🔴 Test 2: Verify that the status text is exactly \"Not Found\"\r",
+									"    pm.test(\"Response status text is 'Not Found'\", function () {\r",
+									"        pm.expect(pm.response.status).to.eql(\"Not Found\"); // string check\r",
+									"    });\r",
+									"\r",
+									"    // 🔴 Test 3: Validate the error message in the JSON response\r",
+									"    pm.test(\"Error message is returned when product is not found\", function () {\r",
+									"        const responseData = pm.response.json();  // parse error response\r",
+									"\r",
+									"        // Response must be an object\r",
+									"        pm.expect(responseData).to.be.an('object');\r",
+									"\r",
+									"        // Must contain a key called \"error\"\r",
+									"        pm.expect(responseData).to.have.property('error');\r",
+									"\r",
+									"        // Error must be a string and should mention \"No product with id\"\r",
+									"        pm.expect(responseData.error).to.be.a('string');\r",
+									"        pm.expect(responseData.error).to.include(\"No product with id\"); \r",
+									"    });\r",
+									"\r",
+									"} \r",
+									"// ✅ Case 3: Any other unexpected status code\r",
+									"else {\r",
+									"    // ⚠️ If response code is NOT 200 or 404 → skip tests and log warning in console\r",
+									"    console.warn(\"⚠️ Skipping tests: unexpected status code\", pm.response.code);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "/*\r\nIf status code = 200 (success) → check fields, types, price rule, and response time.\r\n\r\nIf status code = 404 (not found) → check correct error handling (404 + Not Found + error message).\r\n\r\nElse → log warning in console (helps debugging unexpected cases\r\n*/",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_Url}}/products/:productId",
+							"host": [
+								"{{Base_Url}}"
+							],
+							"path": [
+								"products",
+								":productId"
+							],
+							"query": [
+								{
+									"key": "product-label",
+									"value": "true",
+									"description": "Returns the product label in PDF format.",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "productId",
+									"value": "{{Product_Id}}",
+									"description": "Specifies the product's id you wish to retrieve.\n"
+								}
+							]
+						},
+						"description": "### Get Product Details\n\nThis endpoint retrieves detailed information about a specific product identified by its unique `productId`.\n\n#### Request\n\n- **Method:** GET\n    \n- **URL:** `{{Base_Url}}/products/:productId`\n    \n- **Path Parameter:**\n    \n    - `productId` (required): The unique identifier of the product you want to retrieve.\n        \n\n#### Response\n\n- **Status Code:** 200 OK\n    \n- **Status Code:** 404 Not Found  \n    \n- **Content-Type:** application/json\n    \n- { \"id\": 0, \"category\": \"\", \"name\": \"\", \"manufacturer\": \"\", \"price\": 0, \"current-stock\": 0, \"inStock\": true}\n    \n    - `id`: The unique identifier of the product.\n        \n    - `category`: The category to which the product belongs.\n        \n    - `name`: The name of the product.\n        \n    - `manufacturer`: The manufacturer of the product.\n        \n    - `price`: The price of the product.\n        \n    - `current-stock`: The current stock level of the product.\n        \n    - `inStock`: A boolean indicating whether the product is currently in stock.\n        \n\n#### Notes\n\n- Ensure that the `productId` provided in the request is valid to avoid errors.\n    \n- The response will contain all relevant details about the product, which can be used for displaying product information in applications."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cart",
+			"item": [
+				{
+					"name": "Create a new cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ✅ Case: If response code is 201 (Cart created successfully)\r",
+									"if (pm.response.code === 201) {\r",
+									"\r",
+									"let  JsonData=pm.response.json();\r",
+									"    pm.collectionVariables.set(\"MyCartId\",JsonData.cartId );\r",
+									"\r",
+									"    // Test 1: Status code is 201\r",
+									"    pm.test(\"Response status code is 201 (Created)\", function () {\r",
+									"        pm.expect(pm.response.code).to.equal(201); \r",
+									"    });\r",
+									"\r",
+									"    // Test 2: Response status text should be \"Created\"\r",
+									"    pm.test(\"Response status text is 'Created'\", function () {\r",
+									"        pm.expect(pm.response.status).to.eql(\"Created\");\r",
+									"    });\r",
+									"\r",
+									"    // Parse the JSON response body\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    // Test 3: Response body must be an object\r",
+									"    pm.test(\"Response body is a valid JSON object\", function () {\r",
+									"        pm.expect(responseData).to.be.an(\"object\");\r",
+									"    });\r",
+									"\r",
+									"    // Test 4: Response must contain both keys: \"created\" and \"cartId\"\r",
+									"    pm.test(\"Response body contains keys 'created' and 'cartId'\", function () {\r",
+									"        pm.expect(responseData).to.have.all.keys(\"created\", \"cartId\");\r",
+									"    });\r",
+									"\r",
+									"    // Test 5: \"created\" must be true\r",
+									"    pm.test(\"'created' field is true\", function () {\r",
+									"        pm.expect(responseData.created).to.be.true;\r",
+									"    });\r",
+									"\r",
+									"    // Test 6: \"cartId\" must exist and be a non-empty string\r",
+									"    pm.test(\"'cartId' is a non-empty string\", function () {\r",
+									"        pm.expect(responseData.cartId).to.be.a(\"string\").and.not.empty;\r",
+									"    });\r",
+									"\r",
+									"    // Optional Test 7: Validate cartId format (basic check → contains letters/numbers/dashes/underscores)\r",
+									"    pm.test(\"'cartId' contains only valid characters\", function () {\r",
+									"        pm.expect(responseData.cartId).to.match(/^[A-Za-z0-9\\-_]+$/);\r",
+									"    });\r",
+									"\r",
+									"    // Test 8: Response time should be reasonable (less than 300ms for example)\r",
+									"    pm.test(\"Response time is less than 3000ms\", function () {\r",
+									"        pm.expect(pm.response.responseTime).to.be.below(3000);\r",
+									"    });\r",
+									"\r",
+									"} \r",
+									"// ❌ Case: If response is not 201 (unexpected status code)\r",
+									"else {\r",
+									"    console.warn(\"⚠️ Unexpected status code received:\", pm.response.code, pm.response.status);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{Base_Url}}/carts",
+							"host": [
+								"{{Base_Url}}"
+							],
+							"path": [
+								"carts"
+							],
+							"query": [
+								{
+									"key": "product-label",
+									"value": "true",
+									"description": "Returns the product label in PDF format.",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// =======================\r",
+									"// Tests for GET /carts/:cartId (updated response format)\r",
+									"// =======================\r",
+									"\r",
+									"// 🔹 Case 1: If response code is 200 (cart found successfully)\r",
+									"if (pm.response.code === 200) {\r",
+									"\r",
+									"    // Test 1: Status code must be 200\r",
+									"    pm.test(\"Response status code is 200\", function () {\r",
+									"        pm.expect(pm.response.code).to.equal(200);\r",
+									"    });\r",
+									"\r",
+									"    // Test 2: Response time should be < 300ms\r",
+									"    pm.test(\"Response time is less than 3000ms\", function () {\r",
+									"        pm.expect(pm.response.responseTime).to.be.below(3000);\r",
+									"    });\r",
+									"\r",
+									"    // Parse response body\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    // Test 3: Response body is an object\r",
+									"    pm.test(\"Response body is a JSON object\", function () {\r",
+									"        pm.expect(responseData).to.be.an(\"object\");\r",
+									"    });\r",
+									"\r",
+									"    // Test 4: Response contains \"items\" and \"created\"\r",
+									"    pm.test(\"Response contains required fields\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"items\");\r",
+									"        pm.expect(responseData).to.have.property(\"created\");\r",
+									"    });\r",
+									"\r",
+									"    // Test 5: \"items\" must always be an array\r",
+									"    pm.test(\"'items' is an array\", function () {\r",
+									"        pm.expect(responseData.items).to.be.an(\"array\");\r",
+									"    });\r",
+									"\r",
+									"    // (Optional) Test 6: If items exist, each must be an object (future check for products inside cart)\r",
+									"    if (responseData.items.length > 0) {\r",
+									"        pm.test(\"Each item inside 'items' is an object\", function () {\r",
+									"            responseData.items.forEach(item => {\r",
+									"                pm.expect(item).to.be.an(\"object\");\r",
+									"            });\r",
+									"        });\r",
+									"    }\r",
+									"\r",
+									"    // Test 7: \"created\" must be a string\r",
+									"    pm.test(\"'created' is a string\", function () {\r",
+									"        pm.expect(responseData.created).to.be.a(\"string\");\r",
+									"    });\r",
+									"\r",
+									"    // Test 8: \"created\" follows ISO 8601 date format\r",
+									"    pm.test(\"'created' is a valid ISO 8601 timestamp\", function () {\r",
+									"        const isoRegex = /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$/;\r",
+									"        pm.expect(responseData.created).to.match(isoRegex);\r",
+									"    });\r",
+									"\r",
+									"} \r",
+									"// 🔹 Case 2: If response code is 404 (cart not found)\r",
+									"else if (pm.response.code === 404) {\r",
+									"\r",
+									"    // Test 1: Status code must be 404\r",
+									"    pm.test(\"Response status code is 404\", function () {\r",
+									"        pm.expect(pm.response.code).to.equal(404);\r",
+									"    });\r",
+									"\r",
+									"    // Test 2: Status text must be \"Not Found\"\r",
+									"    pm.test(\"Response status text is 'Not Found'\", function () {\r",
+									"        pm.expect(pm.response.status).to.eql(\"Not Found\");\r",
+									"    });\r",
+									"\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    // Test 3: Response must be an object\r",
+									"    pm.test(\"Response body is an object\", function () {\r",
+									"        pm.expect(responseData).to.be.an(\"object\");\r",
+									"    });\r",
+									"\r",
+									"    // Test 4: Must contain error property\r",
+									"    pm.test(\"Error message exists\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"error\");\r",
+									"        pm.expect(responseData.error).to.be.a(\"string\");\r",
+									"        pm.expect(responseData.error).to.include(\"No cart with id\");\r",
+									"    });\r",
+									"\r",
+									"} \r",
+									"// 🔹 Case 3: Any unexpected response code\r",
+									"else {\r",
+									"    console.warn(\"⚠️ Skipping tests: unexpected status code\", pm.response.code);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{Base_Url}}/carts/:cardId",
+							"host": [
+								"{{Base_Url}}"
+							],
+							"path": [
+								"carts",
+								":cardId"
+							],
+							"variable": [
+								{
+									"key": "cardId",
+									"value": "{{MyCartId}}",
+									"description": "Specifies the id of the cart you wish to retrieve."
+								}
+							]
+						},
+						"description": "### Retrieve Cart Details\n\nThis endpoint retrieves the details of a specific shopping cart identified by the `cartId`. It allows users to view the contents of their cart, including any items that have been added.\n\n#### Request\n\n- **Method**: GET\n    \n- **Endpoint**: `{{Base_Url}}/carts/:cartId`\n    \n- **Path Parameter**:\n    \n    - `cartId` (string): The unique identifier for the shopping cart whose details are to be retrieved.\n        \n\n#### Headers\n\n- **Authorization**: (optional) If authentication is required, include a valid token in the Authorization header.\n    \n\n#### Response\n\n- **Status Code**: 200 OK\n    \n- **Content-Type**: application/json\n    \n\n##### Response Body Structure:\n\n``` json\n{\n  \"items\": [],\n  \"created\": \"\"\n}\n\n ```\n\n- `items` (array): An array containing the items in the cart. This will be empty if no items have been added.\n    \n- `created` (string): A timestamp indicating when the cart was created. This field may be empty if the cart has not been initialized.\n    \n\nThis endpoint is essential for users to manage their shopping carts effectively by allowing them to review the contents before proceeding to checkout."
+					},
+					"response": []
+				},
+				{
+					"name": "Add an item to cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ✅ Case 1: If response code is 201 → Item created successfully\r",
+									"if (pm.response.code === 201) {\r",
+									"\r",
+									"    // Parse response JSON\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    // Test 1: Status code is 201\r",
+									"    pm.test(\"Response status code is 201 (Created)\", function () {\r",
+									"        pm.expect(pm.response.code).to.equal(201);\r",
+									"    });\r",
+									"\r",
+									"    // Test 2: Response body must be an object\r",
+									"    pm.test(\"Response body is an object\", function () {\r",
+									"        pm.expect(responseData).to.be.an(\"object\");\r",
+									"    });\r",
+									"\r",
+									"    // Test 3: Response must contain keys 'created' and 'itemId'\r",
+									"    pm.test(\"Response contains required keys\", function () {\r",
+									"        pm.expect(responseData).to.have.all.keys(\"created\", \"itemId\");\r",
+									"    });\r",
+									"\r",
+									"    // Test 4: 'created' must be true (boolean)\r",
+									"    pm.test(\"'created' is true\", function () {\r",
+									"        pm.expect(responseData.created).to.be.a(\"boolean\").and.to.be.true;\r",
+									"    });\r",
+									"\r",
+									"    // Test 5: 'itemId' must be a number\r",
+									"    pm.test(\"'itemId' is a number\", function () {\r",
+									"        pm.expect(responseData.itemId).to.be.a(\"number\");\r",
+									"    });\r",
+									"\r",
+									"    // Optional Test 6: 'itemId' must be a positive number\r",
+									"    pm.test(\"'itemId' is a positive number\", function () {\r",
+									"        pm.expect(responseData.itemId).to.be.above(0);\r",
+									"    });\r",
+									"\r",
+									"    pm.collectionVariables.set(\"Item_Id\", responseData.itemId);\r",
+									"\r",
+									"} \r",
+									"// ✅ Case 2: If response code is 400 → Bad request (invalid input)\r",
+									"else if (pm.response.code === 400) {\r",
+									"\r",
+									"    // Parse response JSON\r",
+									"    const responseData = pm.response.json();\r",
+									"\r",
+									"    // Test 1: Status code is 400\r",
+									"    pm.test(\"Response status code is 400 (Bad Request)\", function () {\r",
+									"        pm.expect(pm.response.code).to.equal(400);\r",
+									"    });\r",
+									"\r",
+									"    // Test 2: Response body should contain an error message\r",
+									"    pm.test(\"Error message is returned\", function () {\r",
+									"        pm.expect(responseData).to.be.an(\"object\");\r",
+									"        pm.expect(responseData).to.have.property(\"error\");\r",
+									"        pm.expect(responseData.error).to.be.a(\"string\");\r",
+									"    });\r",
+									"} \r",
+									"// ✅ Case 3: Any other unexpected status code\r",
+									"else {\r",
+									"    console.warn(\"⚠️ Skipping tests: Unexpected status code\", pm.response.code);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"productId\": 2177,   // Unique identifier of the product you want to add to the cart\r\n   \"quantity\": 2        // Number of units of this product you want to add\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_Url}}/carts/:cartId/items",
+							"host": [
+								"{{Base_Url}}"
+							],
+							"path": [
+								"carts",
+								":cartId",
+								"items"
+							],
+							"variable": [
+								{
+									"key": "cartId",
+									"value": "{{MyCartId}}"
+								}
+							]
+						},
+						"description": "## Add Item to Cart\n\nThis endpoint allows users to add an item to a specific shopping cart identified by `cartId`.\n\n### Request\n\n- **Method**: POST\n    \n- **Endpoint**: `{{Base_Url}}/carts/:cartId/items`\n    \n\n#### Request Body\n\nThe request body must be in JSON format and should include the following parameter:\n\n- **productId** (integer): The unique identifier of the product that you want to add to the cart.\n    \n\n**Example Request Body:**\n\n``` json\n{\n  \"productId\": 1225\n}\n\n ```\n\n### Response\n\nThe response will indicate the success or failure of the operation.\n\n- **Status Code**:\n    \n    - `200 OK` (successful addition)\n        \n    - `400 Bad Request` (if the request is malformed or if the productId is invalid)\n        \n\n#### Response Structure\n\nIn case of an error, the response will contain the following structure:\n\n- **error** (string): A message providing details about the error encountered during the request.\n    \n\n**Example Error Response:**\n\n``` json\n{\n  \"error\": \"\"\n}\n\n ```\n\n### Notes\n\n- Ensure that the `cartId` in the URL is valid and that the `productId` corresponds to an existing product in the inventory."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cart Items",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ✅ First, parse the response body as JSON\r",
+									"const responseData = pm.response.json();\r",
+									"\r",
+									"// =============================\r",
+									"// ✅ CASE 1: If status code is 200 (Cart found and items returned)\r",
+									"// =============================\r",
+									"if (pm.response.code === 200) {\r",
+									"\r",
+									"    // Test 1: Ensure response status code is 200\r",
+									"    pm.test(\"Response status code is 200\", function () {\r",
+									"        pm.expect(pm.response.code).to.equal(200);\r",
+									"    });\r",
+									"\r",
+									"    // Test 2: Ensure the response is an array (list of items)\r",
+									"    pm.test(\"Response body is an array\", function () {\r",
+									"        pm.expect(responseData).to.be.an(\"array\");\r",
+									"    });\r",
+									"\r",
+									"    // Test 3: If array has items, validate structure of each item\r",
+									"    if (responseData.length > 0) {\r",
+									"\r",
+									"        pm.test(\"Each item in array has correct properties\", function () {\r",
+									"            responseData.forEach(item => {\r",
+									"                // Each item must be an object\r",
+									"                pm.expect(item).to.be.an(\"object\");\r",
+									"\r",
+									"                // Must have required keys: productId, id, quantity\r",
+									"                pm.expect(item).to.have.all.keys(\"productId\", \"id\", \"quantity\");\r",
+									"\r",
+									"                // Validate data types of each field\r",
+									"                pm.expect(item.productId).to.be.a(\"number\"); // productId should be a number\r",
+									"                pm.expect(item.id).to.be.a(\"number\");        // id should be a number\r",
+									"                pm.expect(item.quantity).to.be.a(\"number\");  // quantity should be a number\r",
+									"            });\r",
+									"        });\r",
+									"\r",
+									"        // Test 4: Validate quantity is always >= 1\r",
+									"        pm.test(\"Item quantity must be at least 1\", function () {\r",
+									"            responseData.forEach(item => {\r",
+									"                pm.expect(item.quantity).to.be.at.least(1);\r",
+									"            });\r",
+									"        });\r",
+									"\r",
+									"    } else {\r",
+									"        // ✅ If array is empty, check that it’s truly empty\r",
+									"        pm.test(\"Response array can be empty if no items in cart\", function () {\r",
+									"            pm.expect(responseData.length).to.equal(0);\r",
+									"        });\r",
+									"    }\r",
+									"\r",
+									"}\r",
+									"\r",
+									"// =============================\r",
+									"// ✅ CASE 2: If status code is 404 (Cart not found)\r",
+									"// =============================\r",
+									"else if (pm.response.code === 404) {\r",
+									"\r",
+									"    // Test 1: Ensure response status code is 404\r",
+									"    pm.test(\"Response status code is 404\", function () {\r",
+									"        pm.expect(pm.response.code).to.equal(404);\r",
+									"    });\r",
+									"\r",
+									"    // Test 2: Response body must be an object (not array)\r",
+									"    pm.test(\"Error response is an object\", function () {\r",
+									"        pm.expect(responseData).to.be.an(\"object\");\r",
+									"    });\r",
+									"\r",
+									"    // Test 3: Must have \"error\" property\r",
+									"    pm.test(\"Error response contains 'error' property\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"error\");\r",
+									"        pm.expect(responseData.error).to.be.a(\"string\");\r",
+									"        pm.expect(responseData.error).to.include(\"No cart found\"); // Message should mention missing cart\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"// =============================\r",
+									"// ✅ CASE 3: Any other unexpected status code\r",
+									"// =============================\r",
+									"else {\r",
+									"    console.warn(\"⚠️ Skipping tests: Unexpected status code\", pm.response.code);\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{Base_Url}}/carts/:cartId/items",
+							"host": [
+								"{{Base_Url}}"
+							],
+							"path": [
+								"carts",
+								":cartId",
+								"items"
+							],
+							"variable": [
+								{
+									"key": "cartId",
+									"value": "{{MyCartId}}",
+									"description": "Specifies the id of the cart for which you wish to retrieve the items"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Modify an item in the cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// -------------------------\r",
+									"// Tests for Modify Cart Item API (PATCH /carts/:cartId/items/:itemId)\r",
+									"// -------------------------\r",
+									"\r",
+									"// Store response body safely (in case it's JSON, otherwise fallback to empty object)\r",
+									"let responseData;\r",
+									"try {\r",
+									"    responseData = pm.response.json();\r",
+									"} catch (e) {\r",
+									"    responseData = {};\r",
+									"}\r",
+									"\r",
+									"// -------------------------\r",
+									"// Test 1: Status code is 204 (Success - No Content)\r",
+									"// -------------------------\r",
+									"if (pm.response.code === 204) {\r",
+									"    pm.test(\"Status code is 204 (Item updated successfully)\", function () {\r",
+									"        pm.expect(pm.response.code).to.eql(204);\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"Response body should be empty\", function () {\r",
+									"        pm.expect(pm.response.text()).to.eql(\"\"); // API should not return body\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"// -------------------------\r",
+									"// Test 2: Status code is 400 (Bad Request)\r",
+									"// -------------------------\r",
+									"if (pm.response.code === 400) {\r",
+									"    pm.test(\"Status code is 400 (Bad Request)\", function () {\r",
+									"        pm.expect(pm.response.code).to.eql(400);\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"Response body contains 'error' message\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"error\");\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"// -------------------------\r",
+									"// Test 3: Status code is 404 (Not Found)\r",
+									"// -------------------------\r",
+									"if (pm.response.code === 404) {\r",
+									"    pm.test(\"Status code is 404 (Not Found)\", function () {\r",
+									"        pm.expect(pm.response.code).to.eql(404);\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"Response body contains 'error' message\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"error\");\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"quantity\": 1   // Number of units of the product to keep in the cart (e.g., 1 means one unit)\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_Url}}/carts/:cartId/items/:itemId",
+							"host": [
+								"{{Base_Url}}"
+							],
+							"path": [
+								"carts",
+								":cartId",
+								"items",
+								":itemId"
+							],
+							"variable": [
+								{
+									"key": "cartId",
+									"value": "{{MyCartId}}",
+									"description": "Specifies the cart id."
+								},
+								{
+									"key": "itemId",
+									"value": "92850977",
+									"description": "Specifies the item id."
+								}
+							]
+						},
+						"description": "## Update Cart Item Quantity\n\nThis endpoint allows you to update the quantity of a specific item in a shopping cart.\n\n### Request\n\n- **Method**: PATCH\n    \n- **Endpoint**: `{{Base_Url}}/carts/:cartId/items/:itemId`\n    \n\n### Path Parameters\n\n- `cartId` (string): The unique identifier of the shopping cart.\n    \n- `itemId` (string): The unique identifier of the item in the cart.\n    \n\n### Request Body\n\nThe request body must be in JSON format and should contain the following parameter:\n\n- `quantity` (integer): The new quantity for the specified item. This value should be a positive integer.\n    \n\n#### Example Request Body\n\n``` json\n{\n  \"quantity\": 10\n}\n\n ```\n\n### Response\n\n- **Status Code**: 400\n    \n- **Content-Type**: application/json\n    \n\n#### Response Body\n\nIn case of an error, the response will include an error message in JSON format:\n\n``` json\n{\n  \"error\": \"\"\n}\n\n ```\n\n### Notes\n\n- Ensure that the `quantity` provided is valid and that the item exists in the specified cart.\n    \n- A 400 status code indicates a bad request, which may be due to invalid parameters or other issues with the request."
+					},
+					"response": []
+				},
+				{
+					"name": "Replace an item in the cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ==============================\r",
+									"// Replace an item in the cart (PUT)\r",
+									"// ==============================\r",
+									"\r",
+									"// Step 1: Try parsing the response body as JSON\r",
+									"let responseData;\r",
+									"try {\r",
+									"    responseData = pm.response.json();\r",
+									"} catch (e) {\r",
+									"    responseData = {}; // If response is empty (like 204), set to empty object\r",
+									"}\r",
+									"\r",
+									"// Step 2: Check the response status code\r",
+									"pm.test(\"Status code is either 204, 400, or 404\", function () {\r",
+									"    pm.expect([204, 400, 404]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"// ----------------------------\r",
+									"// Case 1: Item successfully replaced (204 No Content)\r",
+									"// ----------------------------\r",
+									"if (pm.response.code === 204) {\r",
+									"    pm.test(\"Item replaced successfully → No Content returned\", function () {\r",
+									"        // For 204 No Content → response body should be empty\r",
+									"        pm.expect(pm.response.text()).to.eql(\"\");\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"// ----------------------------\r",
+									"// Case 2: Invalid request (400 Bad Request)\r",
+									"// ----------------------------\r",
+									"if (pm.response.code === 400) {\r",
+									"    pm.test(\"Error response contains 'error' message\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"error\");\r",
+									"        pm.expect(responseData.error).to.be.a(\"string\");\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"// ----------------------------\r",
+									"// Case 3: Item or cart not found (404 Not Found)\r",
+									"// ----------------------------\r",
+									"if (pm.response.code === 404) {\r",
+									"    pm.test(\"Error response contains 'error' message\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"error\");\r",
+									"        pm.expect(responseData.error).to.be.a(\"string\");\r",
+									"    });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"productId\": 4875,   // Integer | Required | Unique identifier of the product you want to add to the cart\r\n   \"quantity\": 4        // Integer | Required | Number of units of the product to add (e.g., 4 items)\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_Url}}/carts/:cartId/items/:itemId",
+							"host": [
+								"{{Base_Url}}"
+							],
+							"path": [
+								"carts",
+								":cartId",
+								"items",
+								":itemId"
+							],
+							"variable": [
+								{
+									"key": "cartId",
+									"value": "{{MyCartId}}"
+								},
+								{
+									"key": "itemId",
+									"value": "271504345"
+								}
+							]
+						},
+						"description": "## Update Cart Item\n\nThis endpoint allows you to update the quantity of a specific item in a user's shopping cart. By sending a PUT request to the designated URL, you can modify the details of an item identified by its `itemId` within a cart identified by `cartId`.\n\n### Request\n\n**URL:** `{{Base_Url}}/carts/:cartId/items/:itemId`  \n**Method:** PUT\n\n#### Request Body\n\nThe request body must be in JSON format and should contain the following parameters:\n\n- **productId** (integer): The unique identifier for the product you want to update in the cart.\n    \n- **quantity** (integer): The new quantity of the product to be set in the cart.\n    \n\n**Example Request Body:**\n\n``` json\n{\n  \"productId\": 1710,\n  \"quantity\": 14\n}\n\n ```\n\n### Response\n\nUpon a successful request, the server will return a response that typically includes the updated details of the cart item. The structure of the response may include:\n\n- **itemId** (string): The identifier of the item in the cart.\n    \n- **productId** (integer): The identifier of the product.\n    \n- **quantity** (integer): The updated quantity of the product in the cart.\n    \n- **cartId** (string): The identifier of the cart to which the item belongs.\n    \n\nThis endpoint is essential for maintaining accurate cart information as users adjust their desired quantities of products."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete an item in the cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ==============================\r",
+									"// Delete an item from the cart (DELETE)\r",
+									"// ==============================\r",
+									"\r",
+									"// Step 1: Try parsing the response (it may be empty for 204)\r",
+									"let responseData;\r",
+									"try {\r",
+									"    responseData = pm.response.json();\r",
+									"} catch (e) {\r",
+									"    responseData = {}; // If response is empty (expected for 204), fallback to empty object\r",
+									"}\r",
+									"\r",
+									"// Step 2: Check the response status code is one of the expected values\r",
+									"pm.test(\"Status code is either 204 or 404\", function () {\r",
+									"    pm.expect([204, 404]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"// ----------------------------\r",
+									"// Case 1: Item deleted successfully (204 No Content)\r",
+									"// ----------------------------\r",
+									"if (pm.response.code === 204) {\r",
+									"    pm.test(\"Item deleted successfully → No Content returned\", function () {\r",
+									"        // Response body should be empty for 204\r",
+									"        pm.expect(pm.response.text()).to.eql(\"\");\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"// ----------------------------\r",
+									"// Case 2: Cart or Item not found (404 Not Found)\r",
+									"// ----------------------------\r",
+									"if (pm.response.code === 404) {\r",
+									"    pm.test(\"Error response should contain 'error' message\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"error\");\r",
+									"        pm.expect(responseData.error).to.be.a(\"string\");\r",
+									"    });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{Base_Url}}/carts/:cartId/items/:itemId",
+							"host": [
+								"{{Base_Url}}"
+							],
+							"path": [
+								"carts",
+								":cartId",
+								"items",
+								":itemId"
+							],
+							"variable": [
+								{
+									"key": "cartId",
+									"value": "{{MyCartId}}"
+								},
+								{
+									"key": "itemId",
+									"value": "580995413,"
+								}
+							]
+						},
+						"description": "## API Endpoint: Retrieve Item from Cart\n\n### Purpose\n\nThis endpoint allows users to retrieve details about a specific item within a shopping cart identified by `cartId`. It is useful for obtaining information about the item, such as its pricing, quantity, and other relevant details.\n\n### Request Format\n\n- **Method:** GET\n    \n- **URL:** `{{Base_Url}}/carts/:cartId/items/:itemId`\n    \n\n### Path Parameters\n\n- `cartId` (string): The unique identifier for the shopping cart from which the item is being retrieved.\n    \n- `itemId` (string): The unique identifier for the item within the specified cart.\n    \n\n### Headers\n\n- **Authorization** (string): A token or credentials that authenticate the user making the request. This is required for accessing the cart items.\n    \n- **Content-Type** (string): Typically set to `application/json`, indicating that the request expects a JSON response.\n    \n\n### Response Structure\n\nThe response will return a JSON object containing details about the requested item. The structure may include:\n\n- `itemId`: The unique identifier of the item.\n    \n- `name`: The name of the item.\n    \n- `price`: The price of the item.\n    \n- `quantity`: The quantity of the item in the cart.\n    \n- `description`: A brief description of the item.\n    \n- `imageUrl`: A URL pointing to an image of the item.\n    \n\n### Example Response\n\n``` json\n{\n  \"itemId\": \"12345\",\n  \"name\": \"Sample Item\",\n  \"price\": 19.99,\n  \"quantity\": 2,\n  \"description\": \"This is a sample item description.\",\n  \"imageUrl\": \"http://example.com/image.jpg\"\n}\n\n ```\n\nEnsure that the `cartId` and `itemId` are valid and that the user has the necessary permissions to access the cart details."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "Submit a new order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// -------------------------------\r",
+									"// Parse response as JSON\r",
+									"// -------------------------------\r",
+									"let responseData = pm.response.json();\r",
+									"// -------------------------------\r",
+									"// 1. Validate status codes\r",
+									"// -------------------------------\r",
+									"pm.test(\"Status code is one of (201, 400, 401)\", function () {\r",
+									"    pm.expect([201, 400, 401]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"// -------------------------------\r",
+									"// 2. Success case (201 Created)\r",
+									"// -------------------------------\r",
+									"if (pm.response.code === 201) {\r",
+									"    pm.test(\"Response contains 'orderId'\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"orderId\");\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"'orderId' is a string or number\", function () {\r",
+									"        pm.expect(responseData.orderId).to.satisfy(val => typeof val === \"string\" || typeof val === \"number\");\r",
+									"    });\r",
+									"\r",
+									"    // Save the created orderId into a collection variable for later use\r",
+									"    pm.collectionVariables.set(\"My_Order_ID\", responseData.orderId);\r",
+									"    console.log(\"✅ Order ID saved to collection variable: \", responseData.orderId);\r",
+									"}\r",
+									"\r",
+									"// -------------------------------\r",
+									"// 3. Error case (400 Bad Request)\r",
+									"// -------------------------------\r",
+									"if (pm.response.code === 400) {\r",
+									"    pm.test(\"400 response contains 'error' message\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"error\");\r",
+									"        pm.expect(responseData.error).to.be.a(\"string\");\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"// -------------------------------\r",
+									"// 4. Unauthorized case (401 Unauthorized)\r",
+									"// -------------------------------\r",
+									"if (pm.response.code === 401) {\r",
+									"    pm.test(\"401 response contains 'error' field with authentication message\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"error\");\r",
+									"        pm.expect(responseData.error.toLowerCase()).to.include(\"unauthorized\");\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"// -------------------------------\r",
+									"// 5. General check\r",
+									"// -------------------------------\r",
+									"pm.test(\"Response body is not empty\", function () {\r",
+									"    pm.expect(responseData).to.satisfy(obj => Object.keys(obj).length > 0);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AccessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"cartId\": \"{{MyCartId}}\",\r\n    \"customerName\": \"hazem essam\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_Url}}/orders",
+							"host": [
+								"{{Base_Url}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all orders",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// -------------------------------\r",
+									"// Parse response as JSON\r",
+									"// -------------------------------\r",
+									"let responseData = pm.response.json();\r",
+									"// -------------------------------\r",
+									"// 1. Validate status codes\r",
+									"// -------------------------------\r",
+									"pm.test(\"Status code is one of (200, 401)\", function () {\r",
+									"    pm.expect([200, 401]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"// -------------------------------\r",
+									"// 2. Success case (200 OK)\r",
+									"// -------------------------------\r",
+									"if (pm.response.code === 200) {\r",
+									"    pm.test(\"Response contains an array of orders\", function () {\r",
+									"        pm.expect(responseData).to.be.an(\"array\");\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"Each order has an 'orderId'\", function () {\r",
+									"        responseData.forEach(order => {\r",
+									"            pm.expect(order).to.have.property(\"id\");\r",
+									"        });\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"// -------------------------------\r",
+									"// 3. Unauthorized case (401 Unauthorized)\r",
+									"// -------------------------------\r",
+									"if (pm.response.code === 401) {\r",
+									"    pm.test(\"401 Unauthorized - request has not been authenticated\", function () {\r",
+									"        pm.expect(pm.response.code).to.eql(401);\r",
+									"    });\r",
+									"\r",
+									"  \r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AccessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{Base_Url}}/orders",
+							"host": [
+								"{{Base_Url}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a single order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ==============================\r",
+									"// Get a single order (GET /orders/:orderId)\r",
+									"// ==============================\r",
+									"\r",
+									"// Step 1: Parse response as JSON\r",
+									"let responseData = pm.response.json();\r",
+									"\r",
+									"// Step 2: Check the response status code\r",
+									"pm.test(\"Status code is either 200, 401, or 404\", function () {\r",
+									"    pm.expect([200, 401, 404]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"// ----------------------------\r",
+									"// Case 1: Success (200 OK)\r",
+									"// ----------------------------\r",
+									"if (pm.response.code === 200) {\r",
+									"    pm.test(\"Response contains 'orderId'\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"id\");\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"'orderId' is not empty\", function () {\r",
+									"        pm.expect(responseData.orderId).to.not.be.null;\r",
+									"        pm.expect(responseData.orderId).to.not.eql(\"\");\r",
+									"    });\r",
+									"\r",
+									"    // Save orderId for reuse\r",
+									"    pm.collectionVariables.set(\"orderId\", responseData.orderId);\r",
+									"}\r",
+									"\r",
+									"// ----------------------------\r",
+									"// Case 2: Unauthorized (401 Unauthorized)\r",
+									"// ----------------------------\r",
+									"if (pm.response.code === 401) {\r",
+									"    pm.test(\"401 Unauthorized response contains 'error' message\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"error\");\r",
+									"        pm.expect(responseData.error).to.be.a(\"string\");\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"// ----------------------------\r",
+									"// Case 3: Not Found (404 Not Found)\r",
+									"// ----------------------------\r",
+									"if (pm.response.code === 404) {\r",
+									"    pm.test(\"404 Not Found response contains 'error' message\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"error\");\r",
+									"        pm.expect(responseData.error).to.be.a(\"string\");\r",
+									"    });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AccessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{Base_Url}}/orders/:orderId?invoice",
+							"host": [
+								"{{Base_Url}}"
+							],
+							"path": [
+								"orders",
+								":orderId"
+							],
+							"query": [
+								{
+									"key": "invoice",
+									"value": null,
+									"description": "Show the PDF invoice."
+								}
+							],
+							"variable": [
+								{
+									"key": "orderId",
+									"value": "{{orderId}}",
+									"description": "The order id."
+								}
+							]
+						},
+						"description": "### Retrieve Order Details\n\nThis endpoint allows you to retrieve the details of a specific order by its unique identifier (`orderId`). It provides information about the order, including the items purchased, customer details, and any additional comments associated with the order.\n\n#### Request\n\n- **Method**: GET\n    \n- **Endpoint**: `{{Base_Url}}/orders/:orderId?invoice`\n    \n- **Path Parameter**:\n    \n    - `orderId` (required): The unique identifier of the order you wish to retrieve.\n        \n- **Query Parameter**:\n    \n    - `invoice` (optional): A flag to indicate whether to include invoice details in the response.\n        \n\n#### Response\n\n- **Status Code**: 200 OK\n    \n- **Content-Type**: application/json\n    \n- { \"id\": \"\", \"items\": \\[ { \"productId\": 0, \"id\": 0, \"quantity\": 0 } \\], \"customerName\": \"\", \"created\": \"\", \"comment\": \"\"}\n    \n\nThe response will contain the following fields:\n\n- `id`: The unique identifier for the order.\n    \n- `items`: An array of items included in the order, where each item contains:\n    \n    - `productId`: The identifier for the product.\n        \n    - `id`: The identifier for the item.\n        \n    - `quantity`: The quantity of the product ordered.\n        \n- `customerName`: The name of the customer who placed the order.\n    \n- `created`: The timestamp when the order was created.\n    \n- `comment`: Any additional comments related to the order."
+					},
+					"response": []
+				},
+				{
+					"name": "Update an order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ==============================\r",
+									"// Update an order (PATCH /orders/:orderId)\r",
+									"// ==============================\r",
+									"\r",
+									"// Step 1: Parse response as JSON\r",
+									"let responseData = pm.response.json();\r",
+									"\r",
+									"// Step 2: Check the response status code\r",
+									"pm.test(\"Status code is either 204, 400, 401, or 404\", function () {\r",
+									"    pm.expect([204, 400, 401, 404]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"// ----------------------------\r",
+									"// Case 1: Success (204 No Content)\r",
+									"// ----------------------------\r",
+									"if (pm.response.code === 204) {\r",
+									"    pm.test(\"Order updated successfully → No Content returned\", function () {\r",
+									"        // 204 No Content → response body should be empty\r",
+									"        pm.expect(pm.response.text()).to.eql(\"\");\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"// ----------------------------\r",
+									"// Case 2: Invalid request (400 Bad Request)\r",
+									"// ----------------------------\r",
+									"if (pm.response.code === 400) {\r",
+									"    pm.test(\"400 Bad Request response contains 'error' message\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"error\");\r",
+									"        pm.expect(responseData.error).to.be.a(\"string\");\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"// ----------------------------\r",
+									"// Case 3: Unauthorized (401 Unauthorized)\r",
+									"// ----------------------------\r",
+									"if (pm.response.code === 401) {\r",
+									"    pm.test(\"401 Unauthorized response contains 'error' message\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"error\");\r",
+									"        pm.expect(responseData.error).to.be.a(\"string\");\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"// ----------------------------\r",
+									"// Case 4: Not Found (404 Not Found)\r",
+									"// ----------------------------\r",
+									"if (pm.response.code === 404) {\r",
+									"    pm.test(\"404 Not Found response contains 'error' message\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"error\");\r",
+									"        pm.expect(responseData.error).to.be.a(\"string\");\r",
+									"    });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AccessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"customerName\":\"Hazem Essam\",\r\n    \"comment\":\"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_Url}}/orders/:orderId",
+							"host": [
+								"{{Base_Url}}"
+							],
+							"path": [
+								"orders",
+								":orderId"
+							],
+							"variable": [
+								{
+									"key": "orderId",
+									"value": "{{My_Order_ID}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete an order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ==============================\r",
+									"// Delete an order (DELETE /orders/:orderId)\r",
+									"// ==============================\r",
+									"\r",
+									"// Step 1: Parse response as JSON\r",
+									"let responseData = pm.response.json();\r",
+									"\r",
+									"// Step 2: Check the response status code\r",
+									"pm.test(\"Status code is either 204, 400, 401, or 404\", function () {\r",
+									"    pm.expect([204, 400, 401, 404]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"// ----------------------------\r",
+									"// Case 1: Success (204 No Content)\r",
+									"// ----------------------------\r",
+									"if (pm.response.code === 204) {\r",
+									"    pm.test(\"Order deleted successfully → No Content returned\", function () {\r",
+									"        // 204 No Content → response body should be empty\r",
+									"        pm.expect(pm.response.text()).to.eql(\"\");\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"// ----------------------------\r",
+									"// Case 2: Invalid request (400 Bad Request)\r",
+									"// ----------------------------\r",
+									"if (pm.response.code === 400) {\r",
+									"    pm.test(\"400 Bad Request response contains 'error' message\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"error\");\r",
+									"        pm.expect(responseData.error).to.be.a(\"string\");\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"// ----------------------------\r",
+									"// Case 3: Unauthorized (401 Unauthorized)\r",
+									"// ----------------------------\r",
+									"if (pm.response.code === 401) {\r",
+									"    pm.test(\"401 Unauthorized response contains 'error' message\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"error\");\r",
+									"        pm.expect(responseData.error).to.be.a(\"string\");\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"// ----------------------------\r",
+									"// Case 4: Not Found (404 Not Found)\r",
+									"// ----------------------------\r",
+									"if (pm.response.code === 404) {\r",
+									"    pm.test(\"404 Not Found response contains 'error' message\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"error\");\r",
+									"        pm.expect(responseData.error).to.be.a(\"string\");\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{AccessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{Base_Url}}/orders/:orderId",
+							"host": [
+								"{{Base_Url}}"
+							],
+							"path": [
+								"orders",
+								":orderId"
+							],
+							"variable": [
+								{
+									"key": "orderId",
+									"value": "{{My_Order_ID}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "API Authentication",
+			"item": [
+				{
+					"name": "Register a new API Client",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// -------------------------------\r",
+									"// Parse the response body as JSON\r",
+									"// -------------------------------\r",
+									"let responseData = pm.response.json();\r",
+									"// -------------------------------\r",
+									"// 1. Check status codes\r",
+									"// -------------------------------\r",
+									"\r",
+									"pm.test(\"Status code is valid (201, 400, or 409)\", function () {\r",
+									"    pm.expect([201, 400, 409]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"// -------------------------------\r",
+									"// 2. Validate success case (201 Created)\r",
+									"// -------------------------------\r",
+									"\r",
+									"if (pm.response.code === 201) {\r",
+									"    pm.test(\"Response contains 'accessToken'\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"accessToken\");\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"'accessToken' is a string\", function () {\r",
+									"        pm.expect(responseData.accessToken).to.be.a(\"string\");\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"'accessToken' has a reasonable length\", function () {\r",
+									"        pm.expect(responseData.accessToken.length).to.be.above(10);\r",
+									"    });\r",
+									"\r",
+									"    // -------------------------------\r",
+									"    // Save accessToken to a COLLECTION variable\r",
+									"    // -------------------------------\r",
+									"    pm.collectionVariables.set(\"AccessToken\", responseData.accessToken);\r",
+									"}\r",
+									"\r",
+									"// -------------------------------\r",
+									"// 3. Validate client error case (400 Bad Request)\r",
+									"// -------------------------------\r",
+									"\r",
+									"if (pm.response.code === 400) {\r",
+									"    pm.test(\"Error response contains 'error' message\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"error\");\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"'error' message is a string\", function () {\r",
+									"        pm.expect(responseData.error).to.be.a(\"string\");\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"// -------------------------------\r",
+									"// 4. Validate conflict error case (409 Conflict)\r",
+									"// -------------------------------\r",
+									"\r",
+									"if (pm.response.code === 409) {\r",
+									"    pm.test(\"Conflict response contains 'error' message\", function () {\r",
+									"        pm.expect(responseData).to.have.property(\"error\");\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"'error' message mentions duplicate client/email\", function () {\r",
+									"        pm.expect(responseData.error.toLowerCase()).to.include(\"already\");\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"// -------------------------------\r",
+									"// 5. General response structure checks\r",
+									"// -------------------------------\r",
+									"\r",
+									"pm.test(\"Response body is not empty\", function () {\r",
+									"    pm.expect(Object.keys(responseData).length).to.be.above(0);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"clientName\": \"Hazemm\",\r\n   \"clientEmail\": \"hazemm@example.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Base_Url}}/api-clients",
+							"host": [
+								"{{Base_Url}}"
+							],
+							"path": [
+								"api-clients"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "endpoints may require authentication. To submit or view an order, you need to register your API client and obtain an access token.\n\nThe endpoints that require authentication expect a bearer token sent in the `Authorization` header."
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"// ✅ Test 2: Verify that the response time is less than 3000ms (performance test)\r",
+					"pm.test(\"Response time is less than 3000ms\", function () {\r",
+					"    pm.expect(pm.response.responseTime).to.be.below(3000);\r",
+					"});"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "Base_Url",
+			"value": "https://simple-grocery-store-api.click",
+			"description": {
+				"content": "",
+				"type": "text/plain"
+			}
+		},
+		{
+			"key": "MyCartId",
+			"value": ""
+		},
+		{
+			"key": "AccessToken",
+			"value": ""
+		},
+		{
+			"key": "My_Order_ID",
+			"value": ""
+		},
+		{
+			"key": "Product_Id",
+			"value": "1225",
+			"description": {
+				"content": "",
+				"type": "text/plain"
+			}
+		},
+		{
+			"key": "Item_Id",
+			"value": ""
+		}
+	]
+}
