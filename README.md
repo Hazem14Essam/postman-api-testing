@@ -251,11 +251,3 @@ The token is valid for **7 days**.
 - `400 Bad Request` → Invalid request  
 - `409 Conflict` → Email already registered  
 
----
-
-## 🚀 Getting Started
-
-1. Clone this repo  
-2. Import the API collection into **Postman**  
-3. Register a new client to obtain an **access token**  
-4. Test endpoints using the provided base URL  
