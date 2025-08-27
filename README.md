@@ -28,8 +28,6 @@ Base URL:https://simple-grocery-store-api.click/
   - Delete an order
 - **API Authentication**
   - Register a new API client
-
----
 ## ✅ Status
 
 **GET** `/status`  
@@ -44,7 +42,8 @@ Returns the status of the API.
 status: UP → API is running
 
 Any other response → API not functioning correctly
-🛍️ Products
+
+s
 Get all products
 
 GET /products
@@ -253,6 +252,3 @@ Import collection into Postman
 
 Test endpoints using the provided base URL
 
-👨‍💻 Author
-
-Created with ❤️ using Postman to practice API testing & documentation.
