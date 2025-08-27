@@ -1,70 +1,68 @@
 # 🛒 Simple Grocery Store API
 
-This API allows you to place a grocery order which will be ready for pick-up in the store.  
-You can browse products, manage carts, and create orders through the API.
+The **Simple Grocery Store API** allows customers to browse products, manage shopping carts, and place grocery orders for in-store pickup.  
+It supports full order lifecycle management with authentication for secure access.  
 
-Base URL:https://simple-grocery-store-api.click/
+**Base URL:**  
+```
+https://simple-grocery-store-api.click/
+```
+
 ---
 
-## 📂 Endpoints
+## 📂 Endpoints Overview
 
 - **Status**
+  - Check API health
 - **Products**
   - Get all products
-  - Get a product
+  - Get product details
 - **Cart**
-  - Get a cart
-  - Get cart items
-  - Create a new cart
-  - Add an item to cart
-  - Modify an item in the cart
-  - Replace an item in the cart
-  - Delete an item in the cart
+  - Create and manage carts
+  - Add, update, replace, or delete items
 - **Orders**
-  - Get all orders
-  - Get a single order
-  - Create a new order
-  - Update an order
-  - Delete an order
-- **API Authentication**
-  - Register a new API client
+  - Create, view, update, and delete orders
+- **Authentication**
+  - Register API clients and get access tokens
+
+---
+
 ## ✅ Status
 
-**GET** `/status`  
+### **GET /status**
 
-Returns the status of the API.  
+Returns the health status of the API.
 
-**Example response**:
+**Example Response**
 ```json
 {
   "status": "UP"
 }
-status: UP → API is running
+```
 
-Any other response → API not functioning correctly
+- `UP` → API is running  
+- Any other response → API not functioning correctly  
 
-s
-Get all products
+---
 
-GET /products
+## 🛍️ Products
+
+### **GET /products**
 
 Returns a list of products from the inventory.
 
-Query Parameters:
+| Parameter   | Type     | Required | Description |
+|-------------|----------|----------|-------------|
+| category    | string   | No       | e.g. meat-seafood, fresh-produce, coffee |
+| results     | integer  | No       | Limit number of results (1–20). Default = 20 |
+| available   | boolean  | No       | Filter only available items |
 
-Name	Type	Required	Description
-category	string	No	meat-seafood, fresh-produce, candy, bread-bakery, dairy, eggs, coffee
-results	integer	No	Number of results (1–20). Default = 20
-available	boolean	No	Filter by availability
+**Status Codes**  
+- `200 OK` → Success  
+- `400 Bad Request` → Invalid parameters  
 
-Status Codes:
-
-200 OK → Success
-
-400 Bad Request → Invalid parameters
-
-Example response:
-
+**Example Response**
+```json
 [
   {
     "id": 4643,
@@ -79,176 +77,183 @@ Example response:
     "inStock": true
   }
 ]
+```
 
-Get a product
+---
 
-GET /products/:productId
+### **GET /products/:productId**
 
-Returns a single product from the inventory.
+Fetches details of a single product.
 
-Parameters:
+| Parameter   | Type     | In   | Required | Description |
+|-------------|----------|------|----------|-------------|
+| productId   | integer  | path | Yes      | Unique product ID |
+| product-label | boolean | query | No     | If true, returns product label in PDF |
 
-Name	Type	In	Required	Description
-productId	integer	path	Yes	ID of the product
-product-label	boolean	query	No	Return label in PDF
+**Status Codes**  
+- `200 OK` → Success  
+- `404 Not Found` → Product not found  
 
-Status Codes:
+---
 
-200 OK → Success
+## 🛒 Cart
 
-404 Not Found → Product not found
+### **POST /carts**
 
-🛒 Cart
-Get a cart
+Creates a new shopping cart.
 
-GET /carts/:cartId
-
-Returns a cart by ID.
-
-Status Codes:
-
-200 OK → Success
-
-404 Not Found → Cart not found
-
-Get cart items
-
-GET /carts/:cartId/items
-
-Returns all items in the cart.
-
-Create a new cart
-
-POST /carts
-
-Creates a new cart and returns the cartId.
-
-Example response:
-
+**Example Response**
+```json
 {
   "created": true,
   "cartId": "bx0-ycNjqIm5IvufuuZ09"
 }
+```
 
-Add an item to cart
+---
 
-POST /carts/:cartId/items
+### **GET /carts/:cartId**
 
-Request body:
+Retrieve a cart by ID.  
 
+- `200 OK` → Success  
+- `404 Not Found` → Cart not found  
+
+---
+
+### **POST /carts/:cartId/items**
+
+Add an item to the cart.
+
+**Request Body**
+```json
 {
   "productId": 1234,
   "quantity": 2
 }
+```
 
+**Status Codes**  
+- `201 Created` → Item added  
+- `400 Bad Request` → Invalid parameters  
 
-Status Codes:
+---
 
-201 Created → Item added
+### **PATCH /carts/:cartId/items/:itemId**
 
-400 Bad Request → Invalid parameters
+Modify an existing cart item.
 
-Modify an item in the cart
-
-PATCH /carts/:cartId/items/:itemId
-
-Request body:
-
+```json
 {
   "quantity": 3
 }
+```
 
-Replace an item in the cart
+---
 
-PUT /carts/:cartId/items/:itemId
+### **PUT /carts/:cartId/items/:itemId**
 
-Request body:
+Replace an existing cart item.
 
+```json
 {
   "productId": 1234,
   "quantity": 1
 }
+```
 
-Delete an item in the cart
+---
 
-DELETE /carts/:cartId/items/:itemId
+### **DELETE /carts/:cartId/items/:itemId**
 
-Removes item from the cart.
+Remove an item from the cart.
 
-📦 Orders
-Get all orders
+---
 
-GET /orders
+## 📦 Orders
 
-Requires Authorization header.
+### **GET /orders**
 
-Get a single order
+Returns all orders.  
+⚠️ Requires **Authorization header**
 
-GET /orders/:orderId
+---
 
-Requires Authorization header.
+### **GET /orders/:orderId**
 
-Create a new order
+Returns details of a single order.  
+⚠️ Requires **Authorization header**
 
-POST /orders
+---
 
-Request body:
+### **POST /orders**
 
+Create a new order.
+
+**Request Body**
+```json
 {
   "cartId": "ZFe4yhG5qNhmuNyrbLWa4",
   "customerName": "John Doe"
 }
+```
 
-Update an order
+---
 
-PATCH /orders/:orderId
+### **PATCH /orders/:orderId**
 
-Request body:
+Update an existing order.
 
+```json
 {
   "customerName": "Jane Doe",
   "comment": "Please deliver between 5–6 PM"
 }
+```
 
-Delete an order
+---
 
-DELETE /orders/:orderId
+### **DELETE /orders/:orderId**
 
-Requires Authorization header.
+Deletes an order.  
+⚠️ Requires **Authorization header**
 
-🔐 API Authentication
+---
 
-Some endpoints require authentication via Bearer Token.
+## 🔐 Authentication
 
-Example header:
+Some endpoints require **Bearer Token Authentication**.
 
+**Header Example**
+```
 Authorization: Bearer YOUR_TOKEN
+```
 
-Register a new API client
+---
 
-POST /api-clients
+### **POST /api-clients**
 
-Request body:
+Register a new API client to receive an access token.  
+The token is valid for **7 days**.
 
+**Request Body**
+```json
 {
   "clientName": "Postman Demo Client",
   "clientEmail": "example@test.com"
 }
+```
 
+**Status Codes**  
+- `201 Created` → Client registered, token returned  
+- `400 Bad Request` → Invalid request  
+- `409 Conflict` → Email already registered  
 
-Status Codes:
+---
 
-201 Created → Client registered, token returned
+## 🚀 Getting Started
 
-400 Bad Request → Invalid request
-
-409 Conflict → Email already registered
-
-🚀 Getting Started
-
-Clone this repo
-
-Import collection into Postman
-
-Test endpoints using the provided base URL
-
+1. Clone this repo  
+2. Import the API collection into **Postman**  
+3. Register a new client to obtain an **access token**  
+4. Test endpoints using the provided base URL  
