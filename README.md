@@ -1,7 +1,9 @@
 # 🛒 Simple Grocery Store API
 
-The **Simple Grocery Store API** allows customers to browse products, manage shopping carts, and place grocery orders for in-store pickup.  
-It supports full order lifecycle management with authentication for secure access.  
+
+This repository contains a **Postman collection** for testing an E-Commerce API.  
+It allows you to explore products, manage shopping carts, and handle orders with authentication.  
+  
 
 **Base URL:**  
 ```
